@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "446699533292",
+    "project_id": "shribedialankar-b8761",
+    "storage_bucket": "shribedialankar-b8761.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:446699533292:android:fff3668207bb4dd57b06c9",
+        "android_client_info": {
+          "package_name": "com.shribedialankar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCh_jxsCgPb1uprS53X3l6rBFhQ7t9a1bk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
