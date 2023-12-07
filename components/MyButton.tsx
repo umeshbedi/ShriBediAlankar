@@ -1,17 +1,18 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { TouchableOpacity } from 'react-native'
-
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6'
 
 type btnType = {
-    text?:string | number,
+    text?: string | number,
     index?: number,
     backgroundColor?: 'grey' | string,
-    color?: 'white' | string
-    onPress?:()=>void
+    color?: 'white' | string,
+    icon?: string,
+    onPress?: () => void
 }
 
-export default function MyButton({ text, index, backgroundColor, color, onPress }: btnType) {
+export default function MyButton({ text, index, backgroundColor, color, onPress, icon }: btnType) {
 
     return (
         <TouchableOpacity
@@ -26,9 +27,9 @@ export default function MyButton({ text, index, backgroundColor, color, onPress 
         >
             <Text style={{
                 color: color,
-                textAlign:'center'
+                textAlign: 'center'
             }}
-            >{text}</Text>
+            >{icon!=undefined?<FontAwesome6 name={icon} />:null} {text}</Text>
         </TouchableOpacity>
     )
 }

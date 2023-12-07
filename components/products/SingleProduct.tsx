@@ -1,49 +1,92 @@
 import { Image, Modal, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ImageViewer from 'react-native-image-zoom-viewer'
 import { Color, font } from '../myTheme'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import Feather from 'react-native-vector-icons/Feather'
 import Entypo from 'react-native-vector-icons/Entypo'
 import MyButton from '../MyButton'
+import Header from '../Header'
+import { useNavigation } from '@react-navigation/native'
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-export default function SingleProduct() {
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+export default function SingleProduct({ navigation: { navigate } }: NativeStackScreenProps<any>) {
 
   const [modalVisible, setModalVisible] = useState<boolean>(false)
+  const [goldPrice, setGoldPrice] = useState<number>(0)
+  const [weightSelect, setWeightSelect] = useState<number>(0)
+
+  const [Increment, setIncrement] = useState<number>(1)
+  const [sizeSelect, setsizeSelect] = useState<number>(0)
 
   const imageUrls = [
     { url: "", props: { source: require("../../src/necklace.png"), backgroundColor: Color.dark } },
-    { url: "", props: { source: require("../../src/necklace.png"), backgroundColor: Color.dark } },
-    { url: "", props: { source: require("../../src/necklace.png") } },
+    { url: "", props: { source: require("../../src/lakshmiji.png"), backgroundColor: Color.dark } },
+    { url: "", props: { source: require("../../src/pngwing.com.png") } },
   ]
 
   type TableType = {
     name?: string,
     value?: string
   }
-  const priceBreakUp = [
-    { name: "Gold Rate (18 KT)", value: "₹418.25/gm" },
-    { name: "Gold Weight (gms)", value: "1.618" },
-    { name: "Gross Weight", value: "1.68gm" },
-    { name: "Stone Value", value: "₹3000" },
-    { name: "Gold Weight (gms)", value: "1.618" },
-    { name: "Gross Weight", value: "1.68gm" },
-    { name: "Stone Value", value: "₹3000" },
+
+  const priceBreakUp = {
+    carat: 24,
+    weight: [1.8, 2.5, 3.5],
+    size: [2.5, 4.5, 6.5],
+    makingCharge: 25,
+    discount: 5,
+    gst: 3
+  }
+
+  const goldValue = priceBreakUp.weight[weightSelect] * goldPrice
+  const makingCharge = (priceBreakUp.weight[weightSelect] * goldPrice) * priceBreakUp.makingCharge / 100
+  const discount = makingCharge * priceBreakUp.discount / 100
+  const subTotal = goldValue + makingCharge - discount
+  const gst = subTotal * priceBreakUp.gst / 100
+  const grandTotal = subTotal + gst
+
+  const priceList = [
+    { name: `Gold Rate (${priceBreakUp.carat}KT)`, value: `₹${goldPrice}/gm` },
+    { name: "Gold Weight", value: `₹${priceBreakUp.weight[weightSelect]}gm` },
+    { name: "Gold Value", value: `₹${(goldValue).toFixed(2)}` },
+    { name: "Making Charge", value: `₹${makingCharge.toFixed(2)}` },
+    { name: `Discount (${priceBreakUp.discount}%)`, value: `- ₹${discount.toFixed(2)}` },
+    { name: "Sub Total", value: `₹${subTotal.toFixed(2)}` },
+    { name: "GST", value: `₹${gst.toFixed(2)}` },
+
   ]
+
 
   const specification = [
     { name: "Purity", value: "18.00" },
     { name: "Brand", value: "SBA" },
-    { name: "Quantity", value: "1" },
-    { name: "Stone Value", value: "₹3000" },
+    { name: "Quantity", value: Increment },
     { name: "Gender", value: "Women" },
 
   ]
 
 
 
-  const [Increment, setIncrement] = useState<number>(1)
-  const [sizeSelect, setsizeSelect] = useState<number>(0)
+  useEffect(() => {
+    async function loadPrice() {
+      await AsyncStorage.getItem("goldPrice", (err, res) => {
+        if (res != null) {
+          const result = JSON.parse(res)
+          if (priceBreakUp.carat == 18) { setGoldPrice(result.carat18) }
+          else if (priceBreakUp.carat == 22) { setGoldPrice(result.carat22) }
+          else if (priceBreakUp.carat == 24) { setGoldPrice(result.carat24) }
+          // console.log(typeof(result.carat22))
+        }
+      })
+
+    }
+    loadPrice()
+
+
+  }, [])
 
   let star = 4
 
@@ -58,18 +101,41 @@ export default function SingleProduct() {
     isPrice?: boolean
   }
   function Desc({ heading, isPress, content = [], isColorChange = true }: descType) {
+
+    function procedure(e: number) {
+      if (heading == "Size (mm)") {
+        setsizeSelect(e)
+      }
+      else if (heading == "Weight (gm)") {
+        setWeightSelect(e)
+      }
+    }
+
+    function colorChange() {
+      if (heading == "Size (mm)") {
+
+      }
+      else if (heading == "Weight (gm)") {
+
+      }
+    }
+
     return (
       <View style={{ marginTop: 40 }}>
         <Text style={font.subHeading}>{heading}</Text>
         <View style={{ flexDirection: 'row', marginTop: 15, flexWrap: 'wrap', gap: 10 }}>
           {content.map((item: any, index: number) => (
             <MyButton
-              backgroundColor={index == sizeSelect && isColorChange ? Color.gold : Color.lightGrey}
-              color={index == sizeSelect && isColorChange ? "white" : Color.grey}
+              backgroundColor={heading == "Weight (gm)" && index == weightSelect ? Color.gold : 
+              heading == "Size (mm)" && index == sizeSelect ? Color.gold : 
+              Color.lightGrey}
+              color={heading == "Weight (gm)" && index == weightSelect ? "white" :
+                heading == "Size (mm)" && index == sizeSelect ? "white" : 
+                Color.grey}
               text={item}
               index={index}
               key={index}
-              onPress={() => isPress ? setsizeSelect(index) : void (0)}
+              onPress={() => isPress ? procedure(index) : void (0)}
             />
           ))}
         </View>
@@ -81,26 +147,26 @@ export default function SingleProduct() {
     return (
       <View style={{ marginTop: 40 }}>
         <Text style={font.subHeading}>{heading}</Text>
-        <View style={{ flexDirection: 'row', marginTop: 15, flexWrap: 'wrap', gap: 10 }}>
+        <View style={{ flexDirection: 'row', marginTop: 15, flexWrap: 'wrap', gap: 20 }}>
           {content.map((item: TableType, index: number) => (
-            <View style={{ flexDirection: 'row' }} key={index}>
+            <View style={{ flexDirection: 'row', gap: 10 }} key={index}>
               <View style={{ width: '50%' }}>
-                <Text>{item.name}</Text>
+                <Text style={font.para}>{item.name}</Text>
               </View>
               <View style={{ width: '50%' }}>
-                <Text>{item.value}</Text>
+                <Text style={font.para}>{item.value}</Text>
               </View>
             </View>
           ))}
           {isPrice &&
             <>
-              <View style={{ width: '100%', height: 2, backgroundColor: Color.lightGrey }} />
-              <View style={{ flexDirection: 'row' }}>
+
+              <View style={{ flexDirection: 'row', backgroundColor: Color.lightGrey, paddingVertical: 15, paddingHorizontal: 10, gap: 10 }}>
                 <View style={{ width: '50%' }}>
-                  <Text style={{ fontWeight: 'bold' }}>Grand Total</Text>
+                  <Text style={[{ fontWeight: 'bold' }, font.para]}>Grand Total</Text>
                 </View>
                 <View style={{ width: '50%' }}>
-                  <Text style={{ fontWeight: 'bold' }}>₹9000</Text>
+                  <Text style={[{ fontWeight: 'bold' }, font.para]}>₹{grandTotal.toFixed(2)}</Text>
                 </View>
               </View>
               <View style={{ width: '100%', height: 2, backgroundColor: Color.lightGrey }} />
@@ -114,6 +180,7 @@ export default function SingleProduct() {
 
   return (
     <SafeAreaView style={{ position: 'relative' }}>
+
       <ScrollView>
         <View style={{ width: '100%', height: 400 }}>
           <ImageViewer
@@ -121,11 +188,12 @@ export default function SingleProduct() {
             backgroundColor={Color.dark}
             menus={({ cancel, saveToLocal }) => React.createElement(cancel)}
             onClick={() => setModalVisible(true)}
+
           />
         </View>
         <View style={[styles.container]}>
           <Text style={[font.heading]}>Golden Ring</Text>
-          
+
           <View style={styles.rateContainer}>
             {/* Ratings */}
             <View style={styles.ratingView}>
@@ -146,13 +214,13 @@ export default function SingleProduct() {
 
           <Text style={font.para}>A golden necklace, a symbol of wealth and grace, Adorned with jewels, it lights up a face. </Text>
 
-          <Desc isPress={true} heading='Size (mm)' content={[2.5, 4.5, 6.5]} />
+          <Desc isPress={true} heading='Size (mm)' content={priceBreakUp.size} />
 
-          <Desc isPress={false} heading='Weight (gms)' content={[2.5, 4.5, 6.5]} />
+          <Desc isPress={true} heading='Weight (gm)' content={priceBreakUp.weight} />
 
           <Desc isPress={false} isColorChange={false} heading='Styling' content={["wedding", "Engagement", "Anniversery"]} />
 
-          <BreackUpTable heading='Price BreakUp' content={priceBreakUp} />
+          <BreackUpTable heading='Price BreakUp' content={priceList} />
 
           <BreackUpTable heading='Product Specifications' content={specification} isPrice={false} />
 
@@ -160,8 +228,13 @@ export default function SingleProduct() {
 
 
       </ScrollView>
+
+      <View style={{ position: 'absolute', top: 0 }}>
+        <Header isDark />
+      </View>
+
       {/* Add to Cart */}
-      <TouchableOpacity style={styles.addtoCartContainer} activeOpacity={.5}>
+      <TouchableOpacity style={styles.addtoCartContainer} activeOpacity={.5} onPress={() => navigate("MyCart")}>
         <View style={styles.addtartView}>
           <View style={{ flexDirection: 'row' }}>
             <Feather name='shopping-cart' size={27} style={{ color: 'white', marginRight: 15 }} />
@@ -169,7 +242,7 @@ export default function SingleProduct() {
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <Entypo name='flow-line' size={27} color={Color.lightGold} />
-            <Text style={[font.heading, { color: 'white' }]}>₹9000</Text>
+            <Text style={[font.heading, { color: 'white' }]}>₹{(grandTotal * Increment).toFixed(0)}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -223,7 +296,7 @@ const styles = StyleSheet.create({
     padding: 8,
     justifyContent: 'space-between',
     borderRadius: 30,
-    alignItems:'center'
+    alignItems: 'center'
   },
 
   addtoCartContainer: {

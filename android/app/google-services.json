@@ -12,7 +12,20 @@
           "package_name": "com.shribedialankar"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "446699533292-chlsvbsvrk9s4thqgsh0rki5ppdjsobp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.shribedialankar",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "446699533292-ich0j59g4a0ccdhgirb1q3na6hn53658.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCh_jxsCgPb1uprS53X3l6rBFhQ7t9a1bk"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "446699533292-ich0j59g4a0ccdhgirb1q3na6hn53658.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -8,6 +8,7 @@ export const Color = {
     mud: "#898C74",
     lightGrey: "#f6f6f5",
     lightGrey2: "#B3AFA5",
+    lightGrey3: "#dadada",
     grey: "#827D76",
     greyWhite: "#f8f8f8",
     dark: "#26201A",
